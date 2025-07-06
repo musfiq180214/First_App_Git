@@ -1,46 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'login_screen.dart';
+import 'register_login.dart';
 
 class HomeScreen extends StatelessWidget {
-  final String? name;
-  final String? email;
+  const HomeScreen({Key? key}) : super(key: key);
 
-  const HomeScreen({Key? key, this.name, this.email}) : super(key: key);
-
-  void handleLogout(BuildContext context) async {
+  void handleSignOut(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => LoginScreen()),
+      MaterialPageRoute(builder: (_) => RegisterLoginScreen()),
+      (route) => false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Home', style: TextStyle(fontWeight: FontWeight.bold)),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: ElevatedButton.icon(
-              onPressed: () => handleLogout(context),
-              icon: const Icon(Icons.logout, color: Colors.white, size: 20),
-              label: const Text('Logout', style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                elevation: 0,
-              ),
-            ),
-          ),
-        ],
+        title: const Text('Welcome Home', style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
       ),
       body: Container(
         width: double.infinity,
@@ -64,42 +48,45 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Color(0xFF6D5BFF),
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    name != null && name!.isNotEmpty ? name! : 'Welcome!',
-                    style: const TextStyle(
-                      fontSize: 26,
+                  const Text(
+                    'FirstApp',
+                    style: TextStyle(
+                      fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF333333),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  if (email != null && email!.isNotEmpty)
+                  const SizedBox(height: 24),
+                  if (user != null) ...[
                     Text(
-                      email!,
+                      user.displayName ?? 'No Name',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      user.email ?? '',
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
                       ),
                     ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
-                    onPressed: () => handleLogout(context),
-                    icon: const Icon(Icons.logout, color: Colors.white),
-                    label: const Text('Logout', style: TextStyle(color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => handleSignOut(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                      child: const Text('Sign Out', style: TextStyle(color: Colors.white, fontSize: 18)),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

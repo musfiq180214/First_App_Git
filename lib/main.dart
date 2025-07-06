@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';  // ← Add this import
-import 'screens/register_screen.dart';
-import 'screens/login_screen.dart';
+import 'screens/register_login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Firebase Auth',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: RegisterScreen(), // or LoginScreen()
+      home: RegisterLoginScreen(), // ← Start here
     );
   }
 }

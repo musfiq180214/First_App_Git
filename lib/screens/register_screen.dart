@@ -4,26 +4,36 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_screen.dart';
 import 'home_screen.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   void handleRegister(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Create user with email and password
         UserCredential userCredential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController.text.trim(),
-            );
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
-        // Update the display name
         await userCredential.user!.updateDisplayName(nameController.text.trim());
 
-        // Save user data to Firestore
         await FirebaseFirestore.instance
             .collection('users')
             .doc(userCredential.user!.uid)
@@ -33,15 +43,14 @@ class RegisterScreen extends StatelessWidget {
           'createdAt': FieldValue.serverTimestamp(),
         });
 
-        // Navigate to HomeScreen and pass user info
-        Navigator.pushReplacement(
+        if (!mounted) return;
+
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (_) => HomeScreen(
-              name: userCredential.user!.displayName ?? '',
-              email: userCredential.user!.email ?? '',
-            ),
+            builder: (_) => HomeScreen(),
           ),
+          (route) => false,
         );
       } on FirebaseAuthException catch (e) {
         String message = 'Registration failed';
@@ -91,7 +100,7 @@ class RegisterScreen extends StatelessWidget {
               child: Text('Register'),
             ),
             TextButton(
-              onPressed: () => Navigator.push(
+              onPressed: () => Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => LoginScreen()),
               ),

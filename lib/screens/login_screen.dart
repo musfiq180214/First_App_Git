@@ -17,14 +17,12 @@ class LoginScreen extends StatelessWidget {
               password: passwordController.text.trim(),
             );
 
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (_) => HomeScreen(
-              name: userCredential.user!.displayName ?? '',
-              email: userCredential.user!.email ?? '',
-            ),
+            builder: (_) => HomeScreen(),
           ),
+          (route) => false,
         );
       } on FirebaseAuthException catch (e) {
         String message = 'Login failed';
@@ -68,7 +66,7 @@ class LoginScreen extends StatelessWidget {
               child: Text('Login'),
             ),
             TextButton(
-              onPressed: () => Navigator.push(
+              onPressed: () => Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => RegisterScreen()),
               ),
